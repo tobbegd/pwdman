@@ -3,6 +3,8 @@
 
 using namespace std;
 
+extern "C" int runevtest();
+
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 	cout<<"db action done"<<endl;
 	   int i;
@@ -13,7 +15,7 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 		    return 0;
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char **argv){
 	
 	sqlite3* db;
 	char *errMsg = 0;
@@ -42,5 +44,6 @@ int main(int argc, char* argv[]){
 
 	
 	sqlite3_close(db);
+	runevtest();
 	return 0;
 }
