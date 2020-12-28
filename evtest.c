@@ -296,7 +296,7 @@ char **names[EV_MAX + 1] = {
 #define LONG(x) ((x)/BITS_PER_LONG)
 #define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
 
-int runevtest ()
+/*int runevtest ()
 {
   int fd, rd, i, j, k;
   struct input_event ev[64];
@@ -359,7 +359,91 @@ int runevtest ()
     }
   }
 }
+*/
 
+int is_initialized = 0;
+
+int getGlobalKeyPress ()
+{
+  int fd, rd, i, j, k;
+  struct input_event ev[64];
+  int version;
+  unsigned short id[4];
+  unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
+  char name[256] = "Unknown";
+  int abs[5];
+  char * device_name = "/dev/input/event0";
+  int ready_to_return = 0;
+
+  if(is_initialized == 0){
+
+    if ((fd = open(device_name, O_RDONLY)) < 0) {
+        perror("evtest");
+        return 1;
+      }
+
+      if (ioctl(fd, EVIOCGVERSION, &version)) {
+        perror("evtest: can't get version");
+        return 1;
+      }
+
+      ioctl(fd, EVIOCGID, id);
+      ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+      memset(bit, 0, sizeof(bit));
+      ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
+      is_initialized = 1;
+  }
+  
+
+
+  //while (1) {
+    rd = read(fd, ev, sizeof(struct input_event) * 64);
+
+    if (rd < (int) sizeof(struct input_event)) {
+      printf("yyy\n");
+      perror("\nevtest: error reading");
+    }
+
+    for (i = 0; i < rd / sizeof(struct input_event); i++) {
+
+      if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN)) {
+        printf("-----Event: time %ld.%06ld, type %d (%s), code %d (%s), value %02x\n",
+            ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+            events[ev[i].type] ? events[ev[i].type] : "?",
+            ev[i].code,
+            names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",
+            ev[i].value);
+      } else {
+        printf("%%%%% Event: time %ld.%06ld, code %d, value %d\n",
+            ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code, ev[i].value);
+
+            if(ev[i].value == 2 && ev[i].code == 42){
+
+              ready_to_return =1;
+
+            }
+              
+              printf(":::::  :::> %d", ev[i].code);
+
+            if(ready_to_return == 1 && ev[i].code != 42){
+
+              printf("::::: returning :::> %d", ev[i].code);
+              return (int) ev[i].code;
+              ready_to_return = 0;
+            }
+        //printf("pressed value is %d\n", ev[i].value);
+        if ((int)ev[1].value == 1) {
+          //printf("Pressed value is 1\n");
+          if ((int)ev[1].code == 305) {
+            printf("Dump of Data should occour\n");
+          } else if ((int)ev[1].code == 304) {
+            printf("Silencing beeper\n");
+          }
+        }
+      }	
+    }
+  //}
+}
 /*
 int main(int argc, char **argv){
 

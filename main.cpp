@@ -3,7 +3,7 @@
 
 using namespace std;
 
-extern "C" int runevtest();
+extern "C" int getGlobalKeyPress();
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 	cout<<"db action done"<<endl;
@@ -42,8 +42,27 @@ int main(int argc, char **argv){
 	}
 
 
+	int shorts_buffer[2];
+	int shorts_index = -1;
 	
 	sqlite3_close(db);
-	runevtest();
+	//runevtest();
+	while(1){
+		int keycode = getGlobalKeyPress();
+		shorts_index ++;
+		printf("shorts index ----> %d\n", shorts_index );
+		shorts_buffer[shorts_index] = keycode;
+		//validate
+		printf("0::>%d 1::>%d\n",shorts_buffer[0], shorts_buffer[1]);
+
+		if(shorts_buffer[0] == 34){
+
+			printf(":: This could be a global command\n");
+		}
+		if(shorts_index >= 1){
+			shorts_index = -1;
+		}
+
+	}
 	return 0;
 }
