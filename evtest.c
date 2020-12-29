@@ -417,21 +417,9 @@ int getGlobalKeyPress ()
         printf("%%%%% Event: time %ld.%06ld, code %d, value %d\n",
             ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code, ev[i].value);
 
-            if(ev[i].value == 2 && ev[i].code == 42){
-
-              ready_to_return =1;
-
-            }
-              
-              printf(":::::  :::> %d", ev[i].code);
-
-            if(ready_to_return == 1 && ev[i].code != 42){
-
-              printf("::::: returning :::> %d", ev[i].code);
+              printf("::::: evtest :::> %d", ev[i].code);
               return (int) ev[i].code;
-              ready_to_return = 0;
-            }
-        //printf("pressed value is %d\n", ev[i].value);
+              
         if ((int)ev[1].value == 1) {
           //printf("Pressed value is 1\n");
           if ((int)ev[1].code == 305) {

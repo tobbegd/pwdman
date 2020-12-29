@@ -3,7 +3,7 @@
 
 using namespace std;
 
-extern "C" int getGlobalKeyPress();
+extern "C" int getGlobalKeyPress(); // Reach in to evtest c program
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 	cout<<"db action done"<<endl;
@@ -42,25 +42,26 @@ int main(int argc, char **argv){
 	}
 
 
-	int shorts_buffer[2];
-	int shorts_index = -1;
+	int run_ev_loop = 1;
+	int open_for_command = 0;
+	int validkeys[9] = {1,2,3,4,5,6,7,8,9};// As seen on keyboard not keycodes
 	
 	sqlite3_close(db);
 	//runevtest();
-	while(1){
+	while(run_ev_loop){
 		int keycode = getGlobalKeyPress();
-		shorts_index ++;
-		printf("shorts index ----> %d\n", shorts_index );
-		shorts_buffer[shorts_index] = keycode;
-		//validate
-		printf("0::>%d 1::>%d\n",shorts_buffer[0], shorts_buffer[1]);
-
-		if(shorts_buffer[0] == 34){
-
-			printf(":: This could be a global command\n");
+		printf("\nincomming->> %d\n", keycode);
+		if(open_for_command == 1){
+			printf(":: COMMAND IS INTEGER \n %d", keycode);
+			bool exists = find(begin(validkeys), end(validkeys), keycode) != end(validkeys);
+}
+			open_for_command = 0;
 		}
-		if(shorts_index >= 1){
-			shorts_index = -1;
+
+		if(keycode == 1){// Esc
+			open_for_command = 1;
+		}else{
+			open_for_command = 0;
 		}
 
 	}
