@@ -1,5 +1,6 @@
 #include "sqlite3.h"
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -13,6 +14,45 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 			       }
 	         printf("\n");
 		    return 0;
+}
+
+int run_ev_loop = 1;
+
+
+// Returns true if x is in range [low..high], else false 
+bool inRange(int low, int high, int x) 
+{ 
+    return  ((x-low) <= (high-low)); 
+} 
+
+void valuateGlobalCommand(int k_code){
+
+
+	printf(":: COMMAND IS INTEGER %d \n",k_code);
+	if(inRange(1,9, k_code)){
+		printf("zesssss");
+
+	}
+}
+
+void runloop(){
+
+	while(run_ev_loop){
+		int keycode = getGlobalKeyPress();
+		printf("\nincomming->> %d\n", keycode);
+
+		if(keycode != -1){
+
+			valuateGlobalCommand(keycode);
+			keycode = -1;
+		}
+
+
+
+
+	}
+
+
 }
 
 int main(int argc, char **argv){
@@ -42,28 +82,11 @@ int main(int argc, char **argv){
 	}
 
 
-	int run_ev_loop = 1;
-	int open_for_command = 0;
-	int validkeys[9] = {1,2,3,4,5,6,7,8,9};// As seen on keyboard not keycodes
-	
+
+
 	sqlite3_close(db);
-	//runevtest();
-	while(run_ev_loop){
-		int keycode = getGlobalKeyPress();
-		printf("\nincomming->> %d\n", keycode);
-		if(open_for_command == 1){
-			printf(":: COMMAND IS INTEGER \n %d", keycode);
-			bool exists = find(begin(validkeys), end(validkeys), keycode) != end(validkeys);
-}
-			open_for_command = 0;
-		}
+	
 
-		if(keycode == 1){// Esc
-			open_for_command = 1;
-		}else{
-			open_for_command = 0;
-		}
-
-	}
+	runloop();
 	return 0;
 }

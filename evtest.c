@@ -361,6 +361,8 @@ char **names[EV_MAX + 1] = {
 }
 */
 
+int super_keycode = 1;
+int last_keycode = -1;
 int is_initialized = 0;
 
 int getGlobalKeyPress ()
@@ -396,7 +398,6 @@ int getGlobalKeyPress ()
   
 
 
-  //while (1) {
     rd = read(fd, ev, sizeof(struct input_event) * 64);
 
     if (rd < (int) sizeof(struct input_event)) {
@@ -417,8 +418,18 @@ int getGlobalKeyPress ()
         printf("%%%%% Event: time %ld.%06ld, code %d, value %d\n",
             ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code, ev[i].value);
 
-              printf("::::: evtest :::> %d", ev[i].code);
-              return (int) ev[i].code;
+              printf("::::: evtest code :::> %d", ev[i].code);
+              printf("::::: evtest value :::> %d \n", ev[i].value);
+              if(last_keycode == super_keycode && ev[i].code != super_keycode ){
+                //is_super_pressed = 1;
+                last_keycode = -1;
+                return (int) ev[i].code;
+              }
+
+                last_keycode = ev[i].code;
+                return -1;
+
+
               
         if ((int)ev[1].value == 1) {
           //printf("Pressed value is 1\n");
@@ -430,12 +441,4 @@ int getGlobalKeyPress ()
         }
       }	
     }
-  //}
 }
-/*
-int main(int argc, char **argv){
-
-
-	runevtest();
-}
-*/
